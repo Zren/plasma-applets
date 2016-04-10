@@ -32,41 +32,60 @@ import "../code/icon.js" as Icon
 
 Item {
     id: main
+
+    property int volumeStep: 65536 / 15
+    property string displayName: i18n("Audio Volume")
+
     Layout.minimumHeight: units.gridUnit * 12
     Layout.minimumWidth: units.gridUnit * 12
     Layout.preferredHeight: units.gridUnit * 20
     Layout.preferredWidth: units.gridUnit * 20
-    property string displayName: i18n("Audio Volume")
 
-    Plasmoid.icon: sinkModel.sinks.length > 0 ? Icon.name(sinkModel.sinks[0].volume, sinkModel.sinks[0].muted) : Icon.name(0, true)
+    Plasmoid.icon: sinkModel.defaultSink ? Icon.name(sinkModel.defaultSink.volume, sinkModel.defaultSink.muted) : Icon.name(0, true)
     Plasmoid.switchWidth: units.gridUnit * 12
     Plasmoid.switchHeight: units.gridUnit * 12
     Plasmoid.toolTipMainText: displayName
-    // FIXME:    Plasmoid.toolTipSubText: sinkModel.volumeText
+    Plasmoid.toolTipSubText: sinkModel.defaultSink ? i18n("Volume at %1%\n%2", volumePercent(sinkModel.defaultSink.volume), sinkModel.defaultSink.description) : ""
 
-    function runOnAllSinks(func) {
-        if (typeof(sinkView) === "undefined") {
-            print("This case we need to handle.");
-            return;
-        } else if (sinkView.count < 0) {
+    function bound(value, min, max) {
+        return Math.max(min, Math.min(value, max));
+    }
+
+    function volumePercent(volume) {
+        return Math.round(100 * volume / 65536);
+    }
+
+    function increaseVolume(showOsd) {
+        if (!sinkModel.defaultSink) {
             return;
         }
-        for (var i = 0; i < sinkView.count; ++i) {
-            sinkView.currentIndex = i;
-            sinkView.currentItem[func]();
+        var volume = bound(sinkModel.defaultSink.volume + volumeStep, 0, 65536);
+        sinkModel.defaultSink.volume = volume;
+        if (showOsd) {
+            osd.show(volumePercent(volume));
         }
     }
 
-    function increaseVolume() {
-        runOnAllSinks("increaseVolume");
+    function decreaseVolume(showOsd) {
+        if (!sinkModel.defaultSink) {
+            return;
+        }
+        var volume = bound(sinkModel.defaultSink.volume - volumeStep, 0, 65536);
+        sinkModel.defaultSink.volume = volume;
+        if (showOsd) {
+            osd.show(volumePercent(volume));
+        }
     }
 
-    function decreaseVolume() {
-        runOnAllSinks("decreaseVolume");
-    }
-
-    function muteVolume() {
-        runOnAllSinks("toggleMute");
+    function muteVolume(showOsd) {
+        if (!sinkModel.defaultSink) {
+            return;
+        }
+        var toMute = !sinkModel.defaultSink.muted;
+        sinkModel.defaultSink.muted = toMute;
+        if (showOsd) {
+            osd.show(toMute ? 0 : volumePercent(sinkModel.defaultSink.volume));
+        }
     }
 
     Plasmoid.compactRepresentation: PlasmaCore.IconItem {
@@ -128,19 +147,19 @@ Item {
             objectName: "increase_volume"
             text: i18n("Increase Volume")
             shortcut: Qt.Key_VolumeUp
-            onTriggered: increaseVolume()
+            onTriggered: increaseVolume(true)
         }
         GlobalAction {
             objectName: "decrease_volume"
             text: i18n("Decrease Volume")
             shortcut: Qt.Key_VolumeDown
-            onTriggered: decreaseVolume()
+            onTriggered: decreaseVolume(true)
         }
         GlobalAction {
             objectName: "mute"
             text: i18n("Mute")
             shortcut: Qt.Key_VolumeMute
-            onTriggered: muteVolume()
+            onTriggered: muteVolume(true)
         }
     }
 
@@ -148,55 +167,132 @@ Item {
         id: osd
     }
 
-    PlasmaExtras.ScrollArea {
-        id: scrollView;
+    PlasmaComponents.TabBar {
+        id: tabBar
 
         anchors {
-            fill: parent
-            rightMargin: 16
+            top: parent.top
+            left: parent.left
+            right: parent.right
         }
 
-        ColumnLayout {
-            property int maximumWidth: scrollView.viewport.width
-            width: maximumWidth
-            Layout.maximumWidth: maximumWidth
+        PlasmaComponents.TabButton {
+            id: devicesTab
+            text: i18n("Devices")
+        }
 
-            Header {
-                Layout.fillWidth: true
-                visible: sinkView.count > 0
-                text: i18n("Playback Devices")
-            }
-            ListView {
-                id: sinkView
+        PlasmaComponents.TabButton {
+            id: streamsTab
+            text: i18n("Applications")
+        }
+    }
 
-                Layout.fillWidth: true
-                Layout.minimumHeight: contentHeight
-                Layout.maximumHeight: contentHeight
+    PlasmaExtras.ScrollArea {
+        id: scrollView;
+        horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
 
-                model: SinkModel {
-                    id: sinkModel
+        anchors {
+            top: tabBar.bottom
+            topMargin: units.smallSpacing
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+
+        Item {
+            width: streamsView.visible ? streamsView.width : devicesView.width
+            height: streamsView.visible ? streamsView.height : devicesView.height
+
+            ColumnLayout {
+                id: streamsView
+                visible: tabBar.currentTab == streamsTab
+                property int maximumWidth: scrollView.viewport.width
+                width: maximumWidth
+                Layout.maximumWidth: maximumWidth
+
+                Header {
+                    Layout.fillWidth: true
+                    visible: sinkInputView.count > 0
+                    text: i18n("Playback Streams")
                 }
-                boundsBehavior: Flickable.StopAtBounds;
-                delegate: SinkListItem {}
-            }
+                ListView {
+                    id: sinkInputView
 
-            Header {
-                Layout.fillWidth: true
-                visible: sourceView.count > 0
-                text: i18n("Capture Devices")
-            }
-            ListView {
-                id: sourceView
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: contentHeight
+                    Layout.maximumHeight: contentHeight
 
-                Layout.fillWidth: true
-                Layout.minimumHeight: contentHeight
-                Layout.maximumHeight: contentHeight
-
-                model: SourceModel {
-                    id: sourceModel
+                    model: PulseObjectFilterModel {
+                        sourceModel: SinkInputModel {}
+                    }
+                    boundsBehavior: Flickable.StopAtBounds;
+                    delegate: StreamListItem {}
                 }
-                boundsBehavior: Flickable.StopAtBounds;
-                delegate: SourceListItem {}
+
+                Header {
+                    Layout.fillWidth: true
+                    visible: sourceOutputView.count > 0
+                    text: i18n("Capture Streams")
+                }
+                ListView {
+                    id: sourceOutputView
+
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: contentHeight
+                    Layout.maximumHeight: contentHeight
+
+                    model: PulseObjectFilterModel {
+                        sourceModel: SourceOutputModel {}
+                    }
+                    boundsBehavior: Flickable.StopAtBounds;
+                    delegate: StreamListItem {}
+                }
+            }
+
+            ColumnLayout {
+                id: devicesView
+                visible: tabBar.currentTab == devicesTab
+                property int maximumWidth: scrollView.viewport.width
+                width: maximumWidth
+                Layout.maximumWidth: maximumWidth
+
+                Header {
+                    Layout.fillWidth: true
+                    visible: sinkView.count > 0
+                    text: i18n("Playback Devices")
+                }
+                ListView {
+                    id: sinkView
+
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: contentHeight
+                    Layout.maximumHeight: contentHeight
+
+                    model: SinkModel {
+                        id: sinkModel
+                    }
+                    boundsBehavior: Flickable.StopAtBounds;
+                    delegate: SinkListItem {}
+                }
+
+                Header {
+                    Layout.fillWidth: true
+                    visible: sourceView.count > 0
+                    text: i18n("Capture Devices")
+                }
+                ListView {
+                    id: sourceView
+
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: contentHeight
+                    Layout.maximumHeight: contentHeight
+
+                    model: SourceModel {
+                        id: sourceModel
+                    }
+                    boundsBehavior: Flickable.StopAtBounds;
+                    delegate: SourceListItem {}
+                }
             }
         }
     }

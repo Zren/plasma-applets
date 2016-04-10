@@ -32,64 +32,23 @@ PlasmaComponents.ListItem {
     id: item
 
     property bool expanded: false
-    property string icon
     property Component subComponent
 
     property alias label: textLabel.text
-    property alias expanderIconVisible: expanderIcon.visible
+    property alias icon: clientIcon.source
 
     enabled: subComponent
 
-    function volumePercent(volume) {
-        return 100 * volume / slider.maximumValue;
-    }
-
     function setVolume(volume) {
         if (volume > 0 && Muted) {
-            toggleMute();
+            Muted = false;
         }
-        Volume = volume
-    }
-
-    function bound(value, min, max) {
-        return Math.max(min, Math.min(value, max));
-    }
-
-    // FIXME: increase/decrease are also present on app streams as they derive
-    //        from this, they are not used there though.
-    //        seems naughty.
-    function increaseVolume() {
-        var step = slider.maximumValue / 15;
-        var volume = bound(PulseObject.volume + step, 0, slider.maximumValue);
-        setVolume(volume);
-        osd.show(volumePercent(volume));
-    }
-
-    function decreaseVolume() {
-        var step = slider.maximumValue / 15;
-        var volume = bound(PulseObject.volume - step, 0, slider.maximumValue);
-        setVolume(volume);
-        osd.show(volumePercent(volume));
-    }
-
-    function toggleMute() {
-        var toMute = !Muted;
-        if (toMute) {
-            osd.show(0);
-        } else {
-            osd.show(volumePercent(Volume));
-        }
-        Muted = toMute;
+        PulseObject.volume = volume
     }
 
     anchors {
         left: parent.left;
         right: parent.right;
-    }
-
-    onIconChanged: {
-        clientIcon.visible = icon ? true : false;
-        clientIcon.icon = icon
     }
 
     ColumnLayout {
@@ -99,11 +58,11 @@ PlasmaComponents.ListItem {
 
         RowLayout {
             Layout.fillWidth: true
-            spacing: 8
+            spacing: units.smallSpacing
 
-            QIconItem {
+            PlasmaCore.IconItem {
                 id: clientIcon
-                visible: false
+                visible: valid
                 Layout.alignment: Qt.AlignHCenter
                 width: height
                 height: column.height * 0.75
@@ -210,13 +169,6 @@ PlasmaComponents.ListItem {
                             interval: 200
                             onTriggered: slider.value = PulseObject.volume
                         }
-
-                        // Block wheel events
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.NoButton
-                            onWheel: wheel.accepted = true
-                        }
                     }
                     PlasmaComponents.Label {
                         id: percentText
@@ -232,10 +184,8 @@ PlasmaComponents.ListItem {
         Loader {
             id: subLoader
 
-            anchors.right: parent.right
-            anchors.left: parent.left
-            anchors.leftMargin: units.gridUnit
-
+            Layout.fillWidth: true
+            Layout.leftMargin: units.gridUnit + clientIcon.width
             Layout.minimumHeight: subLoader.item ? subLoader.item.height : 0
             Layout.maximumHeight: Layout.minimumHeight
         }
@@ -263,7 +213,7 @@ PlasmaComponents.ListItem {
             name: "expanded";
             when: expanded;
             StateChangeScript {
-                script: subLoader.sourceComponent = subComponent;
+                script: subLoader.sourceComponent = Qt.binding(function() { return subComponent; });
             }
         }
     ]

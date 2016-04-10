@@ -20,13 +20,13 @@
 
 function name(volume, muted) {
     // FIXME: hardcoded max value
-    var split_base = 65536/3.0;
     var icon = null;
-    if ((volume / split_base <= 0) || muted) {
+    var percent = volume / 65536;
+    if (percent <= 0.0 || muted) {
         icon = "audio-volume-muted";
-    } else if (volume / split_base <= 1) {
+    } else if (percent <= 0.25) {
         icon = "audio-volume-low";
-    } else if (volume / split_base <= 2) {
+    } else if (percent <= 0.75) {
         icon = "audio-volume-medium";
     } else {
         icon = "audio-volume-high";
