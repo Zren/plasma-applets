@@ -10,8 +10,9 @@ import org.kde.plasma.extras 2.0 as PlasmaExtras
 import org.kde.plasma.private.volume 0.1
 
 GroupBox {
+    id: mixerItemGroup
     style: PlasmaStyles.GroupBoxStyle {}
-    property string title: ''
+    // property string title: ''
     property alias view: view
     property alias spacing: view.spacing
     property alias model: view.model
@@ -21,7 +22,7 @@ GroupBox {
     property string mixerItemIcon: ''
 
     Text {
-        text: parent.title
+        text: mixerItemGroup.title
         color: PlasmaCore.ColorScope.textColor
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter

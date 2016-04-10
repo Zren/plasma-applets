@@ -32,21 +32,11 @@ import "../code/icon.js" as Icon
 
 Item {
     id: main
-    // Layout.minimumHeight: 400
-    // Layout.preferredHeight: 400
-    // Layout.minimumWidth: 400
-    Layout.preferredWidth: mixerItemRow.width
-    // Layout.maximumWidth: Layout.preferredWidth
-    width: mixerItemRow.width
     property string displayName: i18n("Audio Volume")
-
     Plasmoid.icon: sinkModel.sinks.length > 0 ? Icon.name(sinkModel.sinks[0].volume, sinkModel.sinks[0].muted) : Icon.name(0, true)
-    Plasmoid.switchWidth: units.gridUnit * 12
-    Plasmoid.switchHeight: units.gridUnit * 12
+    // Plasmoid.switchWidth: units.gridUnit * 12
+    // Plasmoid.switchHeight: units.gridUnit * 12
     Plasmoid.toolTipMainText: displayName
-    Plasmoid.fullRepresentation: Mixer {
-        id: mixer2
-    }
     // FIXME:    Plasmoid.toolTipSubText: sinkModel.volumeText
 
     function runOnAllSinks(func) {
@@ -117,6 +107,13 @@ Item {
         }
     }
 
+    // Plasmoid.fullRepresentation: Item { }
+    // property alias sinkModel: mixer.sinkModel
+    
+    // Mixer {
+    //     id: mixer
+    // }
+
     GlobalActionCollection {
         // KGlobalAccel cannot transition from kmix to something else, so if
         // the user had a custom shortcut set for kmix those would get lost.
@@ -152,36 +149,7 @@ Item {
     VolumeOSD {
         id: osd
     }
-
-    // id: root
-    // Layout.minimumHeight: units.gridUnit * 12
-    // Layout.minimumWidth: 200
-    // Layout.preferredHeight: units.gridUnit * 24
-    // Layout.preferredWidth: 400
-    // property string displayName: i18n("Audio Volume")
-
-    property int mixerItemWidth: 100
-    property int volumeSliderWidth: 50
-
-    // property alias appsModel: appsModel
-    // property alias sourceModel: sourceModel
-    // property alias sinkModel: sinkModel
-
-    // width: 450
-    // height: Layout.preferredHeight
-
-    // onWidthChanged: {
-    //     Layout.minimumWidth = width
-    //     Layout.preferredWidth = width
-    // }
-
-
-    Rectangle {
-        color: PlasmaCore.ColorScope.backgroundColor
-        anchors.fill: parent
-    }
-
-
+    
     // https://github.com/KDE/plasma-pa/tree/master/src/kcm/package/contents/ui
     PulseObjectFilterModel {
         id: appsModel
@@ -194,7 +162,9 @@ Item {
         id: sinkModel
     }
 
-    RowLayout {
+
+
+    Row {
         id: mixerItemRow
         anchors.right: parent.right
         width: childrenRect.width
@@ -203,15 +173,11 @@ Item {
         // onWidthChanged: {
         //     // parent.width = width
 
-        //     console.log('a', Layout.minimumWidth, Layout.preferredWidth, Layout.maximumWidth, parent.width, width)
+        //     console.log(parent.width, width)
         
-        //     // parent.width = Math.max(width, parent.width)
-        //     // Layout.minimumWidth = Math.max(width, Layout.minimumWidth)
-        //     Layout.preferredWidth = Math.max(width, Layout.preferredWidth)
-        //     Layout.maximumWidth = Math.max(width, Layout.maximumWidth)
-        //     parent.width = Layout.preferredWidth
+        //     parent.width = Math.max(width, parent.width)
 
-        //     console.log('b', Layout.minimumWidth, Layout.preferredWidth, Layout.maximumWidth, parent.width, width)
+        //     console.log(parent.width)
         // }
 
         MixerItemGroup {
@@ -220,8 +186,8 @@ Item {
     
             model: appsModel
             delegate: MixerItem {
-                width: main.mixerItemWidth
-                volumeSliderWidth: main.volumeSliderWidth
+                width: root.mixerItemWidth
+                volumeSliderWidth: root.volumeSliderWidth
                 icon: {
                     var client = PulseObject.client;
                     // Virtual streams don't have a valid client object, force a default icon for them
@@ -254,8 +220,8 @@ Item {
     
             model: sourceModel
             delegate: MixerItem {
-                width: main.mixerItemWidth
-                volumeSliderWidth: main.volumeSliderWidth
+                width: root.mixerItemWidth
+                volumeSliderWidth: root.volumeSliderWidth
                 icon: Volume > 0 ? 'mic-on' : 'mic-off'
             }
         }
@@ -268,5 +234,4 @@ Item {
             mixerItemIcon: 'speaker'
         }
     }
-    
 }
