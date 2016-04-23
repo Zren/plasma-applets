@@ -203,7 +203,7 @@ PinchArea {
 
 
     // https://github.com/KDE/plasma-framework/blob/master/src/declarativeimports/calendar/calendar.cpp
-    Calendar {
+    CalendarBackend {
         id: calendarBackend
 
         days: 7
