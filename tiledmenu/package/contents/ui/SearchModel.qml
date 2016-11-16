@@ -32,7 +32,7 @@ Item {
 	Kicker.RunnerModel {
 		id: runnerModel
 
-		appletInterface: plasmoid
+		// appletInterface: plasmoid // Breaks KDE 5.5
 		favoritesModel: rootModel.favoritesModel
 		// mergeResults: true
 

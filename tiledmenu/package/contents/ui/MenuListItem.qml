@@ -55,7 +55,7 @@ AppToolButton {
 
 				// visible: iconsEnabled
 
-				animated: false
+				// animated: false // Breaks KDE 5.5
 				// usesPlasmaTheme: false
 				source: listView.model.list[index].icon
 			}
