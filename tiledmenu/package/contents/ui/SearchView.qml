@@ -77,6 +77,16 @@ Item {
 					}
 				}
 			}
+			Repeater {
+				model: appsModel.sidebarModel
+				delegate: SidebarItem {
+					icon: model.decoration
+					iconSize: 16
+					text: model.display || model.url || ''
+					onClicked: appsModel.sidebarModel.triggerIndex(index)
+				}
+			}
+
 			SidebarItem {
 				iconName: 'folder-open-symbolic'
 				text: i18n("File Manager")

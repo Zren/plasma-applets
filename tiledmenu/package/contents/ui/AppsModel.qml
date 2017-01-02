@@ -15,6 +15,7 @@ Item {
 	property alias allAppsModel: allAppsModel
 	property alias powerActionsModel: powerActionsModel
 	property alias favoritesModel: favoritesModel
+	property alias sidebarModel: sidebarModel
 
 	signal refreshing()
 	signal refreshed()
@@ -100,6 +101,39 @@ Item {
 			signal triggerIndexAction(int index, string actionId, string actionArgument)
 			onTriggerIndexAction: {
 				var closeRequested = favoritesModel.trigger(index, actionId, actionArgument)
+				if (closeRequested) {
+					plasmoid.expanded = false
+				}
+			}
+
+		}
+
+		property var sidebarModel: Kicker.FavoritesModel {
+			// Kicker.FavoritesModel must be a child object of RootModel.
+			// appEntry.actions() looks at the parent object for parent.appletInterface and will crash plasma if it can't find it.
+			// https://github.com/KDE/plasma-desktop/blob/master/applets/kicker/plugin/appentry.cpp#L151
+			id: sidebarModel
+
+			Component.onCompleted: {
+				favorites = 'file:///home/chris/Videos,file:///home/chris/Music'.split(',')
+				// favorites = plasmoid.configuration.favoriteApps
+			}
+
+			onFavoritesChanged: {
+				// plasmoid.configuration.favoriteApps = favorites
+			}
+
+			signal triggerIndex(int index)
+			onTriggerIndex: {
+				var closeRequested = sidebarModel.trigger(index, "", null)
+				if (closeRequested) {
+					plasmoid.expanded = false
+				}
+			}
+
+			signal triggerIndexAction(int index, string actionId, string actionArgument)
+			onTriggerIndexAction: {
+				var closeRequested = sidebarModel.trigger(index, actionId, actionArgument)
 				if (closeRequested) {
 					plasmoid.expanded = false
 				}

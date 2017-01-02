@@ -14,6 +14,8 @@ PlasmaComponents.ToolButton {
 	width: parent.width
 	height: config.flatButtonSize
 	iconName: ""
+	property var icon: null
+	property int iconSize: config.flatButtonIconSize
 	property bool expanded: true
 	text: ""
 	property string label: expanded ? text : ""
@@ -34,14 +36,15 @@ PlasmaComponents.ToolButton {
 			Item {
 				Layout.fillHeight: true
 				Layout.preferredWidth: height
-				visible: control.iconName
+				visible: !!icon.source
 
 				PlasmaCore.IconItem {
 					id: icon
-					source: control.iconName || control.iconSource
-					width: config.flatButtonIconSize
-					height: config.flatButtonIconSize
+					source: control.iconName || control.iconSource || control.icon
+					width: control.iconSize
+					height: control.iconSize
 					anchors.centerIn: parent
+					usesPlasmaTheme: true
 					// colorGroup: PlasmaCore.Theme.ButtonColorGroup
 				}
 			}
