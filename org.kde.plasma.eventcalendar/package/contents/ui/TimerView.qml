@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Window 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles.Plasma 2.0 as Styles
 import QtQuick.Layouts 1.1
@@ -14,7 +15,7 @@ Item {
 
     property int timerSeconds: 0
     property int timerDuration: 0
-    property int defaultTimerWidth: 48
+    property int defaultTimerWidth: 3 * units.gridUnit
     property alias timerRepeats: timerRepeatsButton.isChecked
     property alias timerSfxEnabled: timerSfxEnabledButton.isChecked
 
