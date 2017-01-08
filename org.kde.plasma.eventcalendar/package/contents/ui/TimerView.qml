@@ -1,5 +1,4 @@
 import QtQuick 2.0
-import QtQuick.Window 2.2
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles.Plasma 2.0 as Styles
 import QtQuick.Layouts 1.1
