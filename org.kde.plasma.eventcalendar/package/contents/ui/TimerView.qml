@@ -14,7 +14,7 @@ Item {
 
     property int timerSeconds: 0
     property int timerDuration: 0
-    property int defaultTimerWidth: 48
+    property int defaultTimerWidth: 3 * units.gridUnit
     property alias timerRepeats: timerRepeatsButton.isChecked
     property alias timerSfxEnabled: timerSfxEnabledButton.isChecked
 

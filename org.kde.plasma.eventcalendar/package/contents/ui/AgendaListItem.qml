@@ -36,7 +36,7 @@ RowLayout {
 
         Column {
             id: itemWeatherColumn
-            width: 50
+            width: 3 * units.gridUnit
             Layout.alignment: Qt.AlignTop
 
             FontIcon {
@@ -97,7 +97,7 @@ RowLayout {
 
         Column {
             id: itemDateColumn
-            width: 50
+            width: 2.5 * units.gridUnit
 
             Text {
                 id: itemDate
