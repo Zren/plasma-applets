@@ -255,6 +255,9 @@ MouseArea {
                         event.accepted = true
                         // nextItemInFocusChain().nextItemInFocusChain().focus = true
                         listView.currentIndex = index + 1
+                    } else if (event.key == Qt.Key_Return && event.modifiers == Qt.ControlModifier) {
+                        event.accepted = true
+                        setComplete(true);
                     } else if (event.key == Qt.Key_Up && event.modifiers == Qt.ControlModifier) {
                         event.accepted = true
                         if (index > 0) {
