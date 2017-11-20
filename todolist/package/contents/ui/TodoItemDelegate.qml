@@ -17,6 +17,7 @@ MouseArea {
     hoverEnabled: true
 
     property var todoModel: listView.model
+    readonly property bool isCompleted: model.status == 'completed'
 
     function setComplete(completed) {
         var newStatus = completed ? 'completed' : 'needsAction'
@@ -130,7 +131,7 @@ MouseArea {
             anchors.top: parent.top
             Layout.preferredHeight: 30 * units.devicePixelRatio
             Layout.preferredWidth: 30 * units.devicePixelRatio
-            checked: model.status == 'completed'
+            checked: todoItemDelegate.isCompleted
 
             onClicked: setComplete(checked)
 
@@ -257,7 +258,7 @@ MouseArea {
                         listView.currentIndex = index + 1
                     } else if (event.key == Qt.Key_Return && event.modifiers == Qt.ControlModifier) {
                         event.accepted = true
-                        setComplete(true);
+                        setComplete(!todoItemDelegate.isCompleted)
                     } else if (event.key == Qt.Key_Up && event.modifiers == Qt.ControlModifier) {
                         event.accepted = true
                         if (index > 0) {
