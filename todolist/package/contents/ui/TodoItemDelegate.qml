@@ -256,7 +256,8 @@ MouseArea {
                         event.accepted = true
                         // nextItemInFocusChain().nextItemInFocusChain().focus = true
                         listView.currentIndex = index + 1
-                    } else if (event.key == Qt.Key_Return && event.modifiers == Qt.ControlModifier) {
+                    } else if ((event.key == Qt.Key_Return && event.modifiers == Qt.ControlModifier)
+                            || (event.key == Qt.Key_Return && event.modifiers == Qt.AltModifier)) {
                         event.accepted = true
                         setComplete(!todoItemDelegate.isCompleted)
                     } else if (event.key == Qt.Key_Up && event.modifiers == Qt.ControlModifier) {
