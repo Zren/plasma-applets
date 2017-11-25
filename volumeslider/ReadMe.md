@@ -1,8 +1,8 @@
-# volumeslider
+# Volume Slider
 
-Description
+A simple horizontal volume slider panel widget.
 
 ## Screenshots
 
-![](https://i.imgur.com/asdf.png)
+![](https://i.imgur.com/HFZG7e1.png)
 
