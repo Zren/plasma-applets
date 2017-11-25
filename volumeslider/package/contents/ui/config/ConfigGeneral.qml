@@ -16,7 +16,6 @@ ConfigPage {
 			ConfigSpinBox {
 				configKey: "width"
 				suffix: i18n("px")
-				
 			}
 			Label {
 				text: i18n(" by ")
@@ -35,7 +34,7 @@ ConfigPage {
 
 		ConfigCheckBox {
 			configKey: "showInPopup"
-			text: i18n("Show In Popup")
+			text: i18n("Show In Popup: Relog after enabling to fix issues.")
 		}
 
 		ConfigCheckBox {
