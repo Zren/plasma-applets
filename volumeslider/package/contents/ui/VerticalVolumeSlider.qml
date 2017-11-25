@@ -23,7 +23,7 @@ PlasmaComponents.Slider {
 
 	property bool showPercentageLabel: true
 	property bool showVisualFeedback: config.showVisualFeedback
-	readonly property bool isPeaking: volumePeakLoader.active && volumePeakLoader.item
+	readonly property bool isPeaking: false // volumePeakLoader.active && volumePeakLoader.item
 	readonly property real peakValue: isPeaking ? volumePeakLoader.item.defaultSinkPeak : 65536
 	readonly property real peakRatio: peakValue / 65536
 	// Loader {
