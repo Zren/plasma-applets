@@ -15,6 +15,7 @@ Item {
 		id: config
 		property bool showVisualFeedback: false
 		property string volumeSliderUrl: plasmoid.file("images", "volumeslider-default.svg")
+		property int intervalBeforeResetingVolumeBoost: 5000
 	}
 
 	//sinkModel.defaultSink
@@ -52,6 +53,18 @@ Item {
 			property bool ignoreValueChange: true
 			property bool isVolumeBoosted: false
 
+			Timer {
+				id: volumeBoostDoneTimer
+				interval: config.intervalBeforeResetingVolumeBoost
+				onTriggered: slider.isVolumeBoosted = false
+
+				function check() {
+					if (slider.isVolumeBoosted && slider.pulseObject.volume <= 66000) {
+						volumeBoostDoneTimer.restart()
+					}
+				}
+			}
+
 			minimumValue: 0
 			maximumValue: slider.isVolumeBoosted ? 98304 : 65536
 			showPercentageLabel: false
@@ -73,6 +86,7 @@ Item {
 				}
 				value = pulseObject.volume;
 				ignoreValueChange = oldIgnoreValueChange;
+				volumeBoostDoneTimer.check()
 			}
 
 			onValueChanged: {
@@ -97,6 +111,7 @@ Item {
 					// still at v15 (e.g.).
 					updateTimer.restart();
 				}
+				volumeBoostDoneTimer.check()
 			}
 
 			Timer {
