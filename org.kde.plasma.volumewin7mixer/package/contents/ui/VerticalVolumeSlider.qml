@@ -21,6 +21,7 @@ PlasmaComponents.Slider {
 	readonly property int percentage: Math.round(value / hundredPercentValue * 100)
 	readonly property int maxPercentage: Math.ceil(maximumValue / hundredPercentValue * 100)
 
+	property bool showPercentageLabel: true
 	property bool showVisualFeedback: config.showVisualFeedback
 	readonly property bool isPeaking: volumePeakLoader.active && volumePeakLoader.item
 	readonly property real peakValue: isPeaking ? volumePeakLoader.item.defaultSinkPeak : 65536
@@ -61,7 +62,9 @@ PlasmaComponents.Slider {
 		id: style
 
 		property int numTicks: Math.ceil(control.maxPercentage / 10) + 1 // 0% .. 100% by 10 = 11 ticks (or ...150% = 16 ticks)
-		property real tickAvailableHeight: (control.width - control.grooveThickness) / 2
+		property real controlWidth: orientation == Qt.Vertical ? control.width : control.height
+		property real controlLength: orientation == Qt.Vertical ? control.height : control.width
+		property real tickAvailableHeight: (style.controlWidth - control.grooveThickness) / 2
 		
 		function calcTickWidth(tickIndex) {
 			if (tickIndex == 0) {
@@ -81,6 +84,7 @@ PlasmaComponents.Slider {
 		handle: Item {
 			width: handle.naturalSize.width
 			height: handle.naturalSize.height
+
 			PlasmaCore.SvgItem {
 				id: handle
 				anchors.fill: parent
@@ -95,12 +99,19 @@ PlasmaComponents.Slider {
 					}
 				}
 			}
+			// Rectangle { anchors.fill: handle; border.color: "red"; color: "transparent"; border.width: 1; }
+
 			PlasmaComponents.Label {
+				id: percentageLabel
+				visible: slider.showPercentageLabel
 				text: control.percentage
 				anchors.horizontalCenter: handle.horizontalCenter
 				anchors.bottom: handle.top
 				rotation: control.orientation == Qt.Vertical ? 90 : 0
+				// horizontalAlignment: control.orientation == Qt.Vertical ? Text.AlignRight : Text.AlignHCenter
+				verticalAlignment: control.orientation == Qt.Vertical ? Text.AlignVCenter : Text.AlignBottom
 			}
+			// Rectangle { anchors.fill: percentageLabel; border.color: "yellow"; color: "transparent"; border.width: 1; }
 		}
 
 		groove: Item {
@@ -217,17 +228,11 @@ PlasmaComponents.Slider {
 				// width: 3
 				width: 1
 				height: style.calcTickWidth(index)
-				y: control.width / 2 + control.grooveThickness / 2
+				y: {
+					return style.controlWidth / 2 + control.grooveThickness / 2
+				}
 				x: {
-					// if (index == 0) { // Align tick at very bottom to it's bottom.
-					// 	return 0
-					// } else if (index == repeater.count-1) { // Align tick at very top to it's top.
-					// 	return repeater.width - width
-					// } else {
-						//Position ticklines from styleData.handleWidth to width - styleData.handleWidth/2
-						//position them at an half handle width increment
-						return styleData.handleWidth / 2 + index * ((control.height - styleData.handleWidth) / (repeater.count>1 ? repeater.count-1 : 1)) - 1
-					// }
+					return styleData.handleWidth / 2 + index * ((style.controlLength - styleData.handleWidth) / (repeater.count>1 ? repeater.count-1 : 1)) - 1
 				}
 
 			}
