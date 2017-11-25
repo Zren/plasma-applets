@@ -6,14 +6,8 @@
   <kcfgfile name=""/>
 
   <group name="General">
-    <entry name="exampleBool" type="Bool">
-      <default>false</default>
-    </entry>
-    <entry name="exampleInt" type="Int">
-      <default>1</default>
-    </entry>
-    <entry name="exampleString" type="String">
-      <default>asdf</default>
+    <entry name="volumeChangeFeedback" type="bool">
+      <default>true</default>
     </entry>
   </group>
 
