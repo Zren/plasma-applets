@@ -6,6 +6,15 @@
   <kcfgfile name=""/>
 
   <group name="General">
+    <entry name="width" type="int">
+      <default>120</default>
+    </entry>
+    <entry name="height" type="int">
+      <default>40</default>
+    </entry>
+    <entry name="showInPopup" type="bool">
+      <default>false</default>
+    </entry>
     <entry name="volumeChangeFeedback" type="bool">
       <default>true</default>
     </entry>

@@ -18,7 +18,6 @@ Item {
 		property int intervalBeforeResetingVolumeBoost: 5000
 	}
 
-	//sinkModel.defaultSink
 	SinkModel {
 		id: sinkModel
 	}
@@ -28,20 +27,20 @@ Item {
 	}
 
 	function playFeedback(sinkIndex) {
-		// if (!plasmoid.configuration.volumeChangeFeedback) {
-		//     return;
-		// }
+		if (!plasmoid.configuration.volumeChangeFeedback) {
+			return;
+		}
 		if (sinkIndex == undefined) {
 			sinkIndex = sinkModel.preferredSink.index;
 		}
 		feedback.play(sinkIndex);
 	}
 
-	Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
+	Plasmoid.preferredRepresentation: plasmoid.configuration.showInPopup ? Plasmoid.compactRepresentation : Plasmoid.fullRepresentation
 
 	Plasmoid.fullRepresentation: Item {
-		Layout.preferredWidth: 120 * units.devicePixelRatio
-		Layout.preferredHeight: 40 * units.devicePixelRatio
+		Layout.preferredWidth: plasmoid.configuration.width * units.devicePixelRatio
+		Layout.preferredHeight: plasmoid.configuration.height * units.devicePixelRatio
 
 		VerticalVolumeSlider {
 			id: slider

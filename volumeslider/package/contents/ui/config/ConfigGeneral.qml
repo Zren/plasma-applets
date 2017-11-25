@@ -9,46 +9,38 @@ ConfigPage {
 	id: page
 	showAppletVersion: true
 
-	property alias cfg_exampleBool: exampleBool.checked
-	property alias cfg_exampleInt: exampleInt.value
-	property alias cfg_exampleString: exampleString.text
-
-
 	ConfigSection {
-		label: i18n("SubHeading")
+		label: i18n("Size")
 
-		CheckBox {
-			id: exampleBool
-			text: i18n("Boolean")
+		RowLayout{
+			ConfigSpinBox {
+				configKey: "width"
+				suffix: i18n("px")
+				
+			}
+			Label {
+				text: i18n(" by ")
+			}
+			ConfigSpinBox {
+				configKey: "height"
+				suffix: i18n("px")
+			}
 		}
-		SpinBox {
-			id: exampleInt
-			suffix: i18n(" units")
-		}
+		
 	}
 
 	
 	ConfigSection {
-		label: i18n("SubHeading")
+		label: i18n("Options")
 
-		ColumnLayout {
-			id: content
-			Layout.fillWidth: true
+		ConfigCheckBox {
+			configKey: "showInPopup"
+			text: i18n("Show In Popup")
+		}
 
-			Text {
-				text: i18n("SubHeading")
-				font.bold: true
-			}
-
-			RowLayout {
-				Text {
-					text: i18n("String")
-				}
-				TextField {
-					id: exampleString
-					placeholderText: i18n("String")
-				}
-			}
+		ConfigCheckBox {
+			configKey: "volumeChangeFeedback"
+			text: i18n("Volume Feedback: Play popping noise when changing the volume.")
 		}
 	}
 }

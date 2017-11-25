@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=volumeslider
-Comment=
+Name=Volume Slider
+Comment=A simple horizontal volume slider panel widget.
 
 Type=Service
-Icon=help-about
+Icon=org.kde.plasma.volume
 X-KDE-ServiceTypes=Plasma/Applet
 
 X-Plasma-API=declarativeappletscript
