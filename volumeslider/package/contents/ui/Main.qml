@@ -142,27 +142,49 @@ Item {
 				slider.isVolumeBoosted = pulseObject.volume > 66000 // 100% is 65863.68, not 65536... Bleh. Just trigger at a round number.
 			}
 		}
-	}
 
-	PlasmaCore.DataSource {
-		id: executeSource
-		engine: "executable"
-		connectedSources: []
-		onNewData: {
-			disconnectSource(sourceName)
+		PlasmaCore.ToolTipArea {
+			anchors.fill: parent
+			mainText: main.Plasmoid.toolTipMainText
+			subText: main.Plasmoid.toolTipSubText
 		}
 	}
-	function exec(cmd) {
-		executeSource.connectSource(cmd)
-	}
 
-	function action_openTaskManager() {
-		exec("ksysguard");
+	property string displayName: i18nd("plasma_applet_org.kde.plasma.volume", "Audio Volume")
+	property string speakerIcon: sinkModel.defaultSink ? Icon.name(sinkModel.defaultSink.volume, sinkModel.defaultSink.muted) : Icon.name(0, true)
+	Plasmoid.icon: {
+		// if (mpris2Source.hasPlayer && mpris2Source.albumArt) {
+		//     return mpris2Source.albumArt;
+		// } else {
+			return speakerIcon;
+		// }
+	}
+	Plasmoid.toolTipMainText: {
+		// if (mpris2Source.hasPlayer && mpris2Source.track) {
+		//     return mpris2Source.track;
+		// } else {
+			return displayName;
+		// }
+	}
+	Plasmoid.toolTipSubText: {
+		var lines = [];
+		// if (mpris2Source.hasPlayer && mpris2Source.artist) {
+		//     if (mpris2Source.isPaused) {
+		//         lines.push(mpris2Source.artist ? i18ndc("plasma_applet_org.kde.plasma.mediacontroller", "Artist of the song", "by %1 (paused)", mpris2Source.artist) : i18nd("plasma_applet_org.kde.plasma.mediacontroller", "Paused"));
+		//     } else if (mpris2Source.artist) {
+		//         lines.push(i18ndc("plasma_applet_org.kde.plasma.mediacontroller", "Artist of the song", "by %1", mpris2Source.artist));
+		//     }
+		// }
+		if (sinkModel.defaultSink) {
+			var sinkVolumePercent = Math.round(PulseObjectCommands.volumePercent(sinkModel.defaultSink.volume));
+			lines.push(i18nd("plasma_applet_org.kde.plasma.volume", "Volume at %1%", sinkVolumePercent));
+			lines.push(sinkModel.defaultSink.description);
+		}
+		return lines.join('\n');
 	}
 
 	Component.onCompleted: {
-		plasmoid.setAction("openTaskManager", i18n("Start Task Manager"), "utilities-system-monitor");
-
+		
 		// plasmoid.action('configure').trigger() // Uncomment to open the config window on load.
 	}
 }
