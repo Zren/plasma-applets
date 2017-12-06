@@ -1,3 +1,8 @@
+## v21 - December 6 2017
+
+* Add (proper) support for use in the system tray. Will open in it's own popup window.
+* Unchecking echo cancellation will also uncheck the "list to device" if listening to the echo cancelled stream.
+
 ## v20 - November 11 2017
 
 * Use the same shape for the slider handle as Windows 7.
