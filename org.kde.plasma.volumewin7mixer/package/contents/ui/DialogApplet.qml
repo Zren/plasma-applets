@@ -140,7 +140,7 @@ Item {
 	}
 	function closeDialog(usedKeyboard) {
 		dialog.visible = false
-		plasmoid.expanded = false
+		delayedUnexpandTimer.start()
 		dialogClosed(usedKeyboard)
 	}
 	function toggleDialog(usedKeyboard) {
