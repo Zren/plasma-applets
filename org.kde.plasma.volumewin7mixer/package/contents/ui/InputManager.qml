@@ -4,17 +4,14 @@ Item {
     id: inputMananger
 
     Connections {
-        target: plasmoid
-        onExpandedChanged: {
-            if (!plasmoid.expanded) {
-                inputMananger.selectNone()
-            }
-        }
-        onActivated: {
-            // console.log('onActivated', 'expanded', plasmoid.expanded)
-            if (!plasmoid.expanded) { // Shouldn't yet be expanded
+        target: main
+        onDialogOpened: {
+            if (usedKeyboard) {
                 inputMananger.selectDefault()
             }
+        }
+        onDialogClosed: {
+            inputMananger.selectNone()
         }
     }
 

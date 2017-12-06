@@ -156,10 +156,12 @@ PlasmaCore.DataSource {
         return service.startOperationCall(operation);
     }
 
-    property bool isPlasmoidExpanded: plasmoid.expanded
-    onIsPlasmoidExpandedChanged: {
-        if (isPlasmoidExpanded) {
-            retrievePosition();
+    property var mainConnection: Connections {
+        target: main
+        onDialogVisibleChanged: {
+            if (main.dialogVisible) {
+                mpris2Source.retrievePosition()
+            }
         }
     }
 }

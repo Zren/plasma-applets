@@ -36,16 +36,11 @@ import "../code/icon.js" as Icon
 import "../code/sinkcommands.js" as PulseObjectCommands
 import "lib"
 
-Item {
+DialogApplet {
     id: main
 
     AppletConfig { id: config }
 
-    // Layout.minimumHeight: units.gridUnit * 12
-    Layout.preferredHeight: config.mixerGroupHeight + (mediaControllerVisible ? config.mediaControllerHeight : 0)
-    Layout.minimumWidth: 10
-    Layout.preferredWidth: mixerItemRow.width
-    Layout.maximumWidth: plasmoid.screenGeometry.width
     property int maxVolumePercent: 100.0 // plasmoid.configuration.maximumVolume
     property int maxVolumeValue: Math.round(maxVolumePercent * PulseAudio.NormalVolume / 100.0)
     property int volumeStep: Math.round(Plasmoid.configuration.volumeStep * PulseAudio.NormalVolume / 100.0)
@@ -61,9 +56,14 @@ Item {
         draggedStreamType = ''
     }
 
-
     property string displayName: i18nd("plasma_applet_org.kde.plasma.volume", "Audio Volume")
     property string speakerIcon: sinkModel.defaultSink ? Icon.name(sinkModel.defaultSink.volume, sinkModel.defaultSink.muted) : Icon.name(0, true)
+    
+    compactItemIcon: speakerIcon
+    onCompactItemClicked: {
+        main.toggleDialog(false)
+    }
+
     Plasmoid.icon: {
         if (mpris2Source.hasPlayer && mpris2Source.albumArt) {
             return mpris2Source.albumArt;
@@ -94,6 +94,155 @@ Item {
         }
         return lines.join('\n');
     }
+
+
+    property bool showMediaController: plasmoid.configuration.showMediaController
+    property string mediaControllerLocation: plasmoid.configuration.mediaControllerLocation || 'bottom'
+    property bool mediaControllerVisible: showMediaController && mpris2Source.hasPlayer
+    // property int mediaControllerHeight: 56 // = 48px albumArt + 8px seekbar
+
+    dialogContents: Item {
+        id: dialogContents
+
+        width: mixerItemRow.width
+        height: config.mixerGroupHeight + (mediaControllerVisible ? config.mediaControllerHeight : 0)
+
+
+        // Keyboard Navigation/Controls
+        InputManager { id: inputManager }
+        focus: true
+        Keys.forwardTo: inputManager.hasSelection ? [inputManager.selectedMixerItem] : []
+        Keys.onLeftPressed: inputManager.selectLeft()
+        Keys.onRightPressed: inputManager.selectRight()
+        function fireKeyOnDefault(keyName, event) {
+            if (!inputManager.hasSelection) {
+                inputManager.selectDefault()
+                var fnName = 'on' + keyName + 'Pressed'
+                inputManager.selectedMixerItem.Keys[fnName](event) // Manually trigger since it hasn't been forwarded yet.
+            }
+        }
+        Keys.onUpPressed: fireKeyOnDefault('Up', event)
+        Keys.onDownPressed: fireKeyOnDefault('Down', event)
+        Keys.onPressed: fireKeyOnDefault('', event)
+
+        Row {
+            id: mixerItemRow
+            anchors.right: parent.right
+            width: childrenRect.width
+            height: parent.height - (mediaControllerVisible ? config.mediaControllerHeight : 0)
+            spacing: 10
+
+            MixerItemGroup {
+                id: sourceOutputMixerItemGroup
+                height: parent.height
+                title: i18n("Recording Apps")
+
+                model: appOutputsModel
+                mixerGroupType: 'SourceOutput'
+            }
+
+            MixerItemGroup {
+                id: sinkInputMixerItemGroup
+                height: parent.height
+                title: i18n("Apps")
+
+                model: appsModel
+                mixerGroupType: 'SinkInput'
+            }
+
+            MixerItemGroup {
+                id: sourceMixerItemGroup
+                height: parent.height
+                title: i18n("Mics")
+        
+                model: filteredSourceModel
+                mixerGroupType: 'Source'
+            }
+
+            MixerItemGroup {
+                id: sinkMixerItemGroup
+                height: parent.height
+                title: i18n("Speakers")
+                
+                model: filteredSinkModel
+                mixerGroupType: 'Sink'
+            }
+
+        }
+
+        MediaController {
+            id: mediaController
+            width: main.Layout.preferredWidth
+            height: config.mediaControllerHeight
+        }
+
+        PlasmaComponents.ToolButton {
+            id: pinButton
+            anchors.top: parent.top
+            anchors.right: parent.right
+            width: Math.round(units.gridUnit * 1.25)
+            height: width
+            checkable: true
+            iconSource: "window-pin"
+            onCheckedChanged: plasmoid.hideOnWindowDeactivate = !checked
+        }
+
+        states: [
+            State {
+                name: "mediaControllerHidden"
+                when: !mediaControllerVisible
+                PropertyChanges {
+                    target: mixerItemRow
+                    anchors.top: mixerItemRow.parent.top
+                    anchors.bottom: mixerItemRow.parent.bottom
+                }
+                PropertyChanges {
+                    target: mediaController
+                    visible: false
+                }
+            },
+            State {
+                name: "mediaControllerTop"
+                when: mediaControllerVisible && mediaControllerLocation == 'top'
+                PropertyChanges {
+                    target: mixerItemRow
+                    // anchors.top: undefined
+                    anchors.topMargin: config.mediaControllerHeight
+                    anchors.bottom: mixerItemRow.parent.bottom
+                }
+                PropertyChanges {
+                    target: mediaController
+                    visible: true
+                    anchors.left: mediaController.parent.left
+                    anchors.top: mediaController.parent.top
+                    anchors.bottom: mixerItemRow.top
+                }
+                PropertyChanges {
+                    target: pinButton
+                    anchors.topMargin: config.mediaControllerHeight
+                }
+            },
+            State {
+                name: "mediaControllerBottom"
+                when: mediaControllerVisible && mediaControllerLocation == 'bottom'
+                PropertyChanges {
+                    target: mixerItemRow
+                    anchors.top: mixerItemRow.parent.top
+                    // anchors.bottom: undefined
+                    anchors.bottomMargin: config.mediaControllerHeight
+                }
+                PropertyChanges {
+                    target: mediaController
+                    visible: true
+                    anchors.left: mediaController.parent.left
+                    anchors.top: mixerItemRow.bottom
+                    anchors.right: mediaController.parent.right
+                    anchors.bottom: mediaController.parent.bottom
+                }
+            }
+        ]
+    }
+
 
     function showOsd(volume) {
         if (plasmoid.configuration.showOsd) {
@@ -181,86 +330,6 @@ Item {
     //     }
     // }
 
-    Plasmoid.compactRepresentation: PlasmaCore.IconItem {
-        source: main.speakerIcon
-        active: mouseArea.containsMouse
-        colorGroup: PlasmaCore.ColorScope.colorGroup
-
-        readonly property bool inPanel: (plasmoid.location == PlasmaCore.Types.TopEdge
-            || plasmoid.location == PlasmaCore.Types.RightEdge
-            || plasmoid.location == PlasmaCore.Types.BottomEdge
-            || plasmoid.location == PlasmaCore.Types.LeftEdge)
-
-        Layout.minimumWidth: {
-            switch (plasmoid.formFactor) {
-            case PlasmaCore.Types.Vertical:
-                return 0;
-            case PlasmaCore.Types.Horizontal:
-                return height;
-            default:
-                return units.gridUnit * 3;
-            }
-        }
-
-        Layout.minimumHeight: {
-            switch (plasmoid.formFactor) {
-            case PlasmaCore.Types.Vertical:
-                return width;
-            case PlasmaCore.Types.Horizontal:
-                return 0;
-            default:
-                return units.gridUnit * 3;
-            }
-        }
-
-        Layout.maximumWidth: inPanel ? units.iconSizeHints.panel : -1
-        Layout.maximumHeight: inPanel ? units.iconSizeHints.panel : -1
-
-        MouseArea {
-            id: mouseArea
-
-            property int wheelDelta: 0
-            property bool wasExpanded: false
-
-            anchors.fill: parent
-            hoverEnabled: true
-            acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-            onPressed: {
-                if (mouse.button == Qt.LeftButton) {
-                    wasExpanded = plasmoid.expanded;
-                } else if (mouse.button == Qt.MiddleButton) {
-                    toggleDefaultSinksMute();
-                }
-            }
-            onClicked: {
-                if (mouse.button == Qt.LeftButton) {
-                    plasmoid.expanded = !wasExpanded;
-                }
-            }
-            onWheel: {
-                var delta = wheel.angleDelta.y || wheel.angleDelta.x;
-                if (delta > 0) {
-                    increaseDefaultSinkVolume();
-                } else if (delta < 0) {
-                    decreaseDefaultSinkVolume();
-                }
-                return;
-                
-                wheelDelta += delta;
-                // Magic number 120 for common "one click"
-                // See: http://qt-project.org/doc/qt-5/qml-qtquick-wheelevent.html#angleDelta-prop
-                while (wheelDelta >= 120) {
-                    wheelDelta -= 120;
-                    increaseDefaultSinkVolume();
-                }
-                while (wheelDelta <= -120) {
-                    wheelDelta += 120;
-                    decreaseDefaultSinkVolume();
-                }
-            }
-        }
-    }
-
     GlobalActionCollection {
         // KGlobalAccel cannot transition from kmix to something else, so if
         // the user had a custom shortcut set for kmix those would get lost.
@@ -337,9 +406,6 @@ Item {
         id: mpris2Source
     }
 
-    // property int mixerItemWidth: 100
-    // property int volumeSliderWidth: 50
-
     // https://github.com/KDE/plasma-pa/tree/master/src/kcm/package/contents/ui
     DynamicFilterModel {
         id: appsModel
@@ -383,209 +449,6 @@ Item {
         }
         return null
     }
-
-    // Keyboard Navigation/Controls
-    InputManager { id: inputManager }
-    focus: true
-    Keys.forwardTo: inputManager.hasSelection ? [inputManager.selectedMixerItem] : []
-    Keys.onLeftPressed: inputManager.selectLeft()
-    Keys.onRightPressed: inputManager.selectRight()
-    function fireKeyOnDefault(keyName, event) {
-        if (!inputManager.hasSelection) {
-            inputManager.selectDefault()
-            var fnName = 'on' + keyName + 'Pressed'
-            inputManager.selectedMixerItem.Keys[fnName](event) // Manually trigger since it hasn't been forwarded yet.
-        }
-    }
-    Keys.onUpPressed: fireKeyOnDefault('Up', event)
-    Keys.onDownPressed: fireKeyOnDefault('Down', event)
-    Keys.onPressed: fireKeyOnDefault('', event)
-
-
-
-    property bool showMediaController: plasmoid.configuration.showMediaController
-    property string mediaControllerLocation: plasmoid.configuration.mediaControllerLocation || 'bottom'
-    property bool mediaControllerVisible: showMediaController && mpris2Source.hasPlayer
-    // property int mediaControllerHeight: 56 // = 48px albumArt + 8px seekbar
-
-    // ScrollView {
-    //     id: scrollView
-    //     anchors.fill: parent
-    //     readonly property int viewportWidth: viewport ? viewport.width : 0
-    //     readonly property int viewportHeight: viewport ? viewport.height : 0
-
-    //     onViewportWidthChanged: flickableItem.contentX = flickableItem.contentWidth - viewportWidth
-
-    Item {
-        anchors.fill: parent
-        // width: childrenRect.width
-        // height: scrollView.viewportHeight
-
-        Row {
-            id: mixerItemRow
-            anchors.right: parent.right
-            width: childrenRect.width
-            height: parent.height - (mediaControllerVisible ? config.mediaControllerHeight : 0)
-            spacing: 10
-
-            MixerItemGroup {
-                id: sourceOutputMixerItemGroup
-                height: parent.height
-                title: i18n("Recording Apps")
-
-                model: appOutputsModel
-                mixerGroupType: 'SourceOutput'
-            }
-
-            MixerItemGroup {
-                id: sinkInputMixerItemGroup
-                height: parent.height
-                title: i18n("Apps")
-
-                model: appsModel
-                mixerGroupType: 'SinkInput'
-            }
-
-            MixerItemGroup {
-                id: sourceMixerItemGroup
-                height: parent.height
-                title: i18n("Mics")
-        
-                model: filteredSourceModel
-                mixerGroupType: 'Source'
-            }
-
-            MixerItemGroup {
-                id: sinkMixerItemGroup
-                height: parent.height
-                title: i18n("Speakers")
-                
-                model: filteredSinkModel
-                mixerGroupType: 'Sink'
-            }
-
-            // GroupBox {
-            //     style: PlasmaStyles.GroupBoxStyle {}
-
-            //     Text {
-            //         text: parent.title
-            //         color: PlasmaCore.ColorScope.textColor
-            //         Layout.fillWidth: true
-            //         horizontalAlignment: Text.AlignHCenter
-            //     }
-                
-            //     ListView {
-            //         model: sinkModel
-            //         width: Math.max(childrenRect.width, mixerItemWidth)
-            //         // width: childrenRect.width
-            //         height: parent.height
-            //         spacing: 10
-            //         boundsBehavior: Flickable.StopAtBounds
-            //         orientation: ListView.Horizontal
-
-            //         delegate: MixerItem {
-            //             width: mixerItemWidth
-            //             volumeSliderWidth: volumeSliderWidth
-            //             icon: 'speaker'
-            //         }
-            //     }
-            // }
-
-        }
-
-        MediaController {
-            id: mediaController
-            width: main.Layout.preferredWidth
-            height: config.mediaControllerHeight
-        }
-
-        states: [
-            State {
-                name: "mediaControllerHidden"
-                when: !mediaControllerVisible
-                PropertyChanges {
-                    target: mixerItemRow
-                    anchors.top: mixerItemRow.parent.top
-                    anchors.bottom: mixerItemRow.parent.bottom
-                }
-                PropertyChanges {
-                    target: mediaController
-                    visible: false
-                }
-            },
-            State {
-                name: "mediaControllerTop"
-                when: mediaControllerVisible && mediaControllerLocation == 'top'
-                PropertyChanges {
-                    target: mixerItemRow
-                    // anchors.top: undefined
-                    anchors.topMargin: config.mediaControllerHeight
-                    anchors.bottom: mixerItemRow.parent.bottom
-                }
-                PropertyChanges {
-                    target: mediaController
-                    visible: true
-                    anchors.left: mediaController.parent.left
-                    anchors.top: mediaController.parent.top
-                    anchors.bottom: mixerItemRow.top
-                }
-                PropertyChanges {
-                    target: pinButton
-                    anchors.topMargin: config.mediaControllerHeight
-                }
-            },
-            State {
-                name: "mediaControllerBottom"
-                when: mediaControllerVisible && mediaControllerLocation == 'bottom'
-                PropertyChanges {
-                    target: mixerItemRow
-                    anchors.top: mixerItemRow.parent.top
-                    // anchors.bottom: undefined
-                    anchors.bottomMargin: config.mediaControllerHeight
-                }
-                PropertyChanges {
-                    target: mediaController
-                    visible: true
-                    anchors.left: mediaController.parent.left
-                    anchors.top: mixerItemRow.bottom
-                    anchors.right: mediaController.parent.right
-                    anchors.bottom: mediaController.parent.bottom
-                }
-            }
-        ]
-    }
-    // }
-
-    PlasmaComponents.ToolButton {
-        id: pinButton
-        anchors.top: parent.top
-        anchors.right: parent.right
-        width: Math.round(units.gridUnit * 1.25)
-        height: width
-        checkable: true
-        iconSource: "window-pin"
-        onCheckedChanged: plasmoid.hideOnWindowDeactivate = !checked
-    }
-
-    // function updateActions() {
-    //     if (plasmoid.configuration.showOpenKcmAudioVolume) {
-    //         plasmoid.setAction("KCMAudioVolume", i18n("Audio Volume Settings..."), "configure");
-    //     } else {
-    //         plasmoid.removeAction("KCMAudioVolume")
-    //     }
-    //     if (plasmoid.configuration.showOpenPavucontrol) {
-    //         plasmoid.setAction("pavucontrol", i18n("PulseAudio Control"), "configure");
-    //     } else {
-    //         plasmoid.removeAction("pavucontrol")
-    //     }
-    // }
-    // 
-    // Connections {
-    //     target: plasmoid
-    //     onContextualActionsAboutToShow: {
-    //         updateActions()
-    //     }
-    // }
 
     function action_alsamixer() {
         executable.exec("konsole -e alsamixer")

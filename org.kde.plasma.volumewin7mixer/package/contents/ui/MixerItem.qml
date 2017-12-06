@@ -67,7 +67,7 @@ PlasmaComponents.ListItem {
                 }
             }
             if (plasmoid.configuration.closeOnSetDefault) {
-                plasmoid.expanded = false
+                main.closeDialog(false)
             }
         }
     }
@@ -697,8 +697,8 @@ PlasmaComponents.ListItem {
             var menuItem = newMenuItem();
             menuItem.text = i18n("Properties");
             menuItem.clicked.connect(function() {
-                mixerItem.showPropertiesDialog();
-                plasmoid.expanded = false;
+                mixerItem.showPropertiesDialog()
+                main.closeDialog(false)
             });
         }
 

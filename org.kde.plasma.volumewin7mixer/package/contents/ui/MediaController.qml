@@ -235,7 +235,7 @@ Item {
                 id: seekTimer
                 interval: 1000
                 repeat: true
-                running: mpris2Source.isPlaying && plasmoid.expanded && !mediaController.keyPressed
+                running: mpris2Source.isPlaying && main.dialogVisible && !mediaController.keyPressed
                 onTriggered: {
                     // console.log(seekSlider.value, seekSlider.maximumValue,
                     //     seekSlider.pressed ? 'pressed' : '',

@@ -3,7 +3,7 @@ import org.kde.plasma.private.volumewin7mixer 1.0
 
 VolumePeaks {
 	id: volumePeaks
-	peaking: plasmoid.expanded
+	peaking: main.dialogVisible
 	property real defaultSinkPeakRatio: defaultSinkPeak / 65536
 	property int defaultSinkPeakPercent: Math.round(defaultSinkPeakRatio*100)
 	property string filename: plasmoid.file("", "code/peak/peak_monitor.py")
