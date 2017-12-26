@@ -106,7 +106,7 @@ Item {
 			acceptedButtons: Qt.LeftButton | Qt.MiddleButton
 			onPressed: compactItem.compactItemPressed(mouse)
 			onClicked: compactItem.compactItemClicked(mouse)
-			onWheel: compactItem.compactItemPressed(wheel)
+			onWheel: compactItem.compactItemWheel(wheel)
 		}
 	}
 

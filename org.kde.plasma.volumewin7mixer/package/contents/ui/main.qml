@@ -61,7 +61,19 @@ DialogApplet {
     
     compactItemIcon: speakerIcon
     onCompactItemClicked: {
-        main.toggleDialog(false)
+        if (mouse.button == Qt.LeftButton) {
+            main.toggleDialog(false)
+        } else if (mouse.button == Qt.MiddleButton) {
+            toggleDefaultSinksMute()
+        }
+    }
+    onCompactItemWheel: {
+        var delta = wheel.angleDelta.y || wheel.angleDelta.x
+        if (delta > 0) {
+            increaseDefaultSinkVolume()
+        } else if (delta < 0) {
+            decreaseDefaultSinkVolume()
+        }
     }
 
     Plasmoid.icon: {
