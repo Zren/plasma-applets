@@ -1,6 +1,6 @@
 ## v22 - December 26 2017
 
-* Reimplement mouse wheel mute, wheel to control volume which was accidently removed in the v21 refactor.
+* Reimplement mouse wheel mute, wheel to control volume which was accidentally removed in the v21 refactor.
 
 ## v21 - December 6 2017
 
