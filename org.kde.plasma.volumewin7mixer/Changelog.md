@@ -1,3 +1,7 @@
+## v22 - December 26 2017
+
+* Reimplement mouse wheel mute, wheel to control volume which was accidently removed in the v21 refactor.
+
 ## v21 - December 6 2017
 
 * Add (proper) support for use in the system tray. Will open in it's own popup window.
