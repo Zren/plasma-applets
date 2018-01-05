@@ -33,6 +33,11 @@ PlasmaComponents.ListItem {
     readonly property bool hasModuleLoopback: PulseObjectCommands.hasLoopbackModuleId(PulseObject)
     readonly property bool hasModuleEchoCancel: PulseObjectCommands.hasEchoCancelModuleId(PulseObject)
 
+    property bool ignoreValueChanges: false
+    function shouldIgnoreVolumeChanges() {
+        return slider.ignoreValueChanges || channelRepeater.hasChannelIgnoreValueChanges()
+    }
+
     Keys.onUpPressed: PulseObjectCommands.increaseVolume(PulseObject)
     Keys.onDownPressed: PulseObjectCommands.decreaseVolume(PulseObject)
     Keys.onPressed: {
@@ -370,7 +375,9 @@ PlasmaComponents.ListItem {
                     // as otherwise we can easily end up in a loop where value
                     // changes trigger volume changes trigger value changes.
                     readonly property int volume: PulseObject.volume
-                    property bool ignoreValueChange: true
+                    
+                    property bool ready: false
+                    property bool ignoreValueChanges: false
 
                     Layout.fillWidth: true
 
@@ -386,16 +393,23 @@ PlasmaComponents.ListItem {
                     }
 
                     onVolumeChanged: {
-                        var oldIgnoreValueChange = ignoreValueChange;
+                        // console.log('oldIgnoreValueChanges = slider.ignoreValueChanges', slider.ignoreValueChanges)
+                        var oldIgnoreValueChanges = slider.ignoreValueChanges
+                        slider.ignoreValueChanges = true
+                        mixerItem.ignoreValueChanges = mixerItem.shouldIgnoreVolumeChanges()
                         if (!mixerItem.isVolumeBoosted && PulseObject.volume > 66000) {
                             mixerItem.isVolumeBoosted = true;
                         }
                         value = PulseObject.volume;
-                        ignoreValueChange = oldIgnoreValueChange;
+                        // console.log('slider.ignoreValueChanges = oldIgnoreValueChanges', slider.ignoreValueChanges, oldIgnoreValueChanges)
+                        slider.ignoreValueChanges = oldIgnoreValueChanges
+                        mixerItem.ignoreValueChanges = mixerItem.shouldIgnoreVolumeChanges()
                     }
 
                     onValueChanged: {
-                        if (!ignoreValueChange) {
+                        // console.log('onValueChanged', slider.ready && !mixerItem.ignoreValueChanges ? 'set' : 'ignored', -1, value)
+                        if (slider.ready && !mixerItem.ignoreValueChanges) {
+                            // console.log('setVolume', value)
                             PulseObjectCommands.setVolume(PulseObject, value);
 
                             if (!pressed) {
@@ -443,7 +457,7 @@ PlasmaComponents.ListItem {
                     }
 
                     Component.onCompleted: {
-                        ignoreValueChange = false
+                        slider.ready = true
                         mixerItem.isVolumeBoosted = PulseObject.volume > 66000 // 100% is 65863.68, not 65536... Bleh. Just trigger at a round number.
                     }
 
@@ -480,11 +494,26 @@ PlasmaComponents.ListItem {
 
 
         Repeater {
+            id: channelRepeater
             model: showChannels && hasChannels ? PulseObject.channels : 0
+
+            function hasChannelIgnoreValueChanges() {
+                for (var i = 0; i < count; i++) {
+                    var item = itemAt(i)
+                    if (item && item.ignoreValueChanges) {
+                        return true
+                    }
+                }
+                return false
+            }
+
             ColumnLayout {
+                id: channelColumn
                 // anchors.fill: parent
                 width: mixerItem.channelSliderWidth
                 height: parent.height
+
+                property bool ignoreValueChanges: false
 
                 PlasmaCore.ToolTipArea {
                     Layout.fillWidth: true
@@ -515,25 +544,34 @@ PlasmaComponents.ListItem {
                         // as otherwise we can easily end up in a loop where value
                         // changes trigger volume changes trigger value changes.
                         readonly property int volume: PulseObject.channelVolumes[index]
-                        property bool ignoreValueChange: true
+
+                        property bool ready: false
+                        readonly property bool isChannelBoosted: volume > 66000
 
                         value: volume
                         minimumValue: 0
                         // FIXME: I do wonder if exposing max through the model would be useful at all
-                        maximumValue: mixerItem.isVolumeBoosted ? 98304 : 65536
+                        maximumValue: mixerItem.isVolumeBoosted || isChannelBoosted ? 98304 : 65536
 
                         onVolumeChanged: {
-                            var oldIgnoreValueChange = ignoreValueChange
-                            if (!mixerItem.isVolumeBoosted && PulseObject.volume > 66000) {
-                                mixerItem.isVolumeBoosted = true
-                            }
+                            // console.log('onVolumeChanged', index, volume)
+                            // console.log('oldIgnoreValueChanges = channelColumn.ignoreValueChanges', channelColumn.ignoreValueChanges)
+                            var oldIgnoreValueChanges = channelColumn.ignoreValueChanges
+                            channelColumn.ignoreValueChanges = true
+                            mixerItem.ignoreValueChanges = mixerItem.shouldIgnoreVolumeChanges()
+                            // if (!mixerItem.isVolumeBoosted && volume > 66000) {
+                            //     mixerItem.isVolumeBoosted = true
+                            // }
                             value = volume
-                            ignoreValueChange = oldIgnoreValueChange
+                            // console.log('channelColumn.ignoreValueChanges = oldIgnoreValueChanges', channelColumn.ignoreValueChanges, oldIgnoreValueChanges)
+                            channelColumn.ignoreValueChanges = oldIgnoreValueChanges
+                            mixerItem.ignoreValueChanges = mixerItem.shouldIgnoreVolumeChanges()
                         }
 
                         onValueChanged: {
-                            if (!ignoreValueChange) {
-                                console.log('onVolumeChanged', index, value)
+                            // console.log('onValueChanged', channelSlider.ready && !mixerItem.ignoreValueChanges ? 'set' : 'ignored', index, value)
+                            if (channelSlider.ready && !mixerItem.ignoreValueChanges) {
+                                // console.log('setChannelVolume', index, Math.floor(value))
                                 PulseObject.setChannelVolume(index, Math.floor(value))
 
                                 if (!pressed) {
@@ -572,7 +610,11 @@ PlasmaComponents.ListItem {
                                 }
                             }
                         }
-                        
+
+                        Component.onCompleted: {
+                            channelSlider.ready = true
+                            // mixerItem.isVolumeBoosted = volume > 66000 // 100% is 65863.68, not 65536... Bleh. Just trigger at a round number.
+                        }
                     }
                 }
 
