@@ -22,7 +22,7 @@ PlasmaComponents.Slider {
 	readonly property int maxPercentage: Math.ceil(maximumValue / hundredPercentValue * 100)
 
 	property bool showPercentageLabel: true
-	property bool showVisualFeedback: config.showVisualFeedback
+	property bool showVisualFeedback: plasmoid.configuration.showVisualFeedback
 	readonly property bool isPeaking: volumePeakLoader.active && volumePeakLoader.item
 	readonly property real peakValue: isPeaking ? volumePeakLoader.item.defaultSinkPeak : 65536
 	readonly property real peakRatio: peakValue / 65536
@@ -31,6 +31,15 @@ PlasmaComponents.Slider {
 		property bool validType: mixerItem.mixerItemType === 'Sink' || mixerItem.mixerItemType === 'Source' || mixerItem.mixerItemType === 'SinkInput' // || mixerItem.mixerItemType === 'SourceOutput'
 		active: showVisualFeedback && validType
 		source: "VolumePeaksManager.qml"
+
+		onStatusChanged: {
+			if (status == Loader.Error) {
+				// Error loading. Disable it so we don't bother trying again.
+				if (plasmoid.configuration.showVisualFeedback) {
+					plasmoid.configuration.showVisualFeedback = false
+				}
+			}
+		}
 	}
 
 	// Component.onCompleted: {

@@ -51,5 +51,8 @@
     <entry name="volumeChangeFeedback" type="bool">
       <default>true</default>
     </entry>
+    <entry name="showVisualFeedback" type="bool">
+      <default>true</default>
+    </entry>
   </group>
 </kcfg>

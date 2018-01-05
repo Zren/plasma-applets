@@ -31,6 +31,4 @@ QtObject {
 		c2.a = alpha
 		return c2
 	}
-
-	property bool showVisualFeedback: false
 }

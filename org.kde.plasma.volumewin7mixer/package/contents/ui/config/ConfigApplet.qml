@@ -23,6 +23,7 @@ ConfigPage {
     property alias cfg_showMediaTotalDuration: showMediaTotalDuration.checked
     property alias cfg_showOsd: showOsd.checked
     property alias cfg_volumeChangeFeedback: volumeChangeFeedback.checked
+    property alias cfg_showVisualFeedback: showVisualFeedback.checked
     property alias cfg_showVirtualStreams: showVirtualStreams.checked
 
     GroupBox {
@@ -162,6 +163,19 @@ ConfigPage {
             CheckBox {
                 id: volumeChangeFeedback
                 text: i18n("Volume Feedback: Play popping noise when changing the volume.")
+            }
+
+            CheckBox {
+                id: showVisualFeedback
+                enabled: false
+                text: i18n("Visual Feedback: Visualize current sound.")
+
+                Component.onCompleted: {
+                    var mixerPluginTest = Qt.createQmlObject('import org.kde.plasma.private.volumewin7mixer 1.0; import QtQuick 2.0; QtObject {}', volumeChangeFeedback)
+                    if (mixerPluginTest) {
+                        enabled = true
+                    }
+                }
             }
 
             CheckBox {
