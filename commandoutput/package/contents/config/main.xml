@@ -15,6 +15,12 @@
     <entry name="waitForCompletion" type="bool">
       <default>true</default>
     </entry>
+    <entry name="expandedMode" type="bool">
+      <default>true</default>
+    </entry>
+    <entry name="icon" type="string">
+      <default>terminal</default>
+    </entry>
   </group>
 
 </kcfg>
