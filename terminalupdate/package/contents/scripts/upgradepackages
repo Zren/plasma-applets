@@ -1,4 +1,5 @@
 #!/bin/bash
+# Version: 2
 
 function echoCommand () {
     echo -e "$(tput setab 12) $(tput sgr0)$(tput setaf 12)\uE0B0$(tput sgr0)$(tput setaf 9) $@$(tput sgr0) "
@@ -40,7 +41,7 @@ if [[ ! -z "$autoremovePackages" ]]; then
     echo ""
     echoCommand "sudo apt autoremove"
     notify-send --icon="update-none" "Auto-Remove Packages" "Need to cleanup unused packages."
-    paplay /usr/share/sounds/KDE-Sys-App-Positive.ogg
+    paplay /usr/share/sounds/KDE-Sys-Question.ogg
     sudo apt autoremove
     result="$?"
     if [ $result != 0 ]; then
