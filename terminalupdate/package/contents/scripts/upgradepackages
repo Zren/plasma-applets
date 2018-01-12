@@ -24,8 +24,8 @@ echo "$upgradeablePackages" \
     | sed "s/\(security\)/$(tput setaf 1)\1$(tput sgr0)/g"
 
 echo ""
-echoCommand "sudo apt upgrade"
-sudo apt upgrade
+echoCommand "sudo apt full-upgrade"
+sudo apt full-upgrade
 
 result="$?"
 if [ $result != 0 ]; then
