@@ -5,6 +5,14 @@ function echoCommand () {
     echo -e "$(tput setab 12) $(tput sgr0)$(tput setaf 12)\uE0B0$(tput sgr0)$(tput setaf 9) $@$(tput sgr0) "
 }
 
+# Check script dependencies
+if ! [ -x "$(command -v notify-send)" ]; then
+    echo "The notify-send command isn't installed yet."
+    echo "It lets us send notifications when updates are finished."
+    echoCommand "sudo apt install libnotify-bin"
+    sudo apt install libnotify-bin
+fi
+
 echoCommand "apt list --upgradeable"
 
 # Ignore "apt API isn't stable warning" sent to stderr.
