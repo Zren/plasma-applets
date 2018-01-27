@@ -46,22 +46,26 @@ Item {
             fill: parent
             topMargin: header.height
         }
-        Label {
-            visible: !DiscoverNotifier.isSystemUpToDate
-            Layout.fillWidth: true
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-            text: DiscoverNotifier.extendedMessage
-        }
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Button {
-                visible: !DiscoverNotifier.isSystemUpToDate
+
+            ColumnLayout {
                 anchors.centerIn: parent
-                text: i18nd("plasma_applet_org.kde.discovernotifier", "Update")
-                tooltip: i18nd("plasma_applet_org.kde.discovernotifier", "Launches the software to perform the update")
-                onClicked: root.action_update()
+                visible: !DiscoverNotifier.isSystemUpToDate
+
+                Label {
+                    wrapMode: Text.WordWrap
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: DiscoverNotifier.extendedMessage
+                }
+
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: i18nd("plasma_applet_org.kde.discovernotifier", "Update")
+                    tooltip: i18nd("plasma_applet_org.kde.discovernotifier", "Launches the software to perform the update")
+                    onClicked: root.action_update()
+                }
             }
 
             Button {
