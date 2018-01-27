@@ -51,6 +51,8 @@ Item {
     }
 
     Component.onCompleted: {
+        plasmoid.setAction("openAptHistoryLog", i18n("Apt History Log"), "text-x-log")
+        // plasmoid.setAction("openAptTermLog", i18n("Apt Terminal Log"), "text-x-log")
         plasmoid.setAction("update", i18n("See Updates..."), "system-software-update");
         plasmoid.setAction("checkForUpdates", i18n("Check For Updates"), "system-software-update");
         plasmoid.setAction("configure", i18n("Updates Settings"), "configure");
@@ -61,6 +63,14 @@ Item {
         var command = "konsole --hide-menubar --hide-tabbar --hold -e \'" + scriptPath + "\'"
         exec(command)
     }
+
+    function action_openAptHistoryLog() {
+        exec("xdg-open /var/log/apt/history.log")
+    }
+
+    // function action_openAptTermLog() {
+    //     exec("xdg-open /var/log/apt/term.log")
+    // }
 
     function action_update() {
         execScript("scripts/upgradepackages")

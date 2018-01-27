@@ -29,22 +29,29 @@ Item {
     Layout.preferredWidth: 384 * units.devicePixelRatio
     Layout.preferredHeight: 330 * units.devicePixelRatio
 
-
-    PlasmaExtras.Heading {
-        id: header
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
-        level: 3
-        wrapMode: Text.WordWrap
-        text: DiscoverNotifier.message
-    }
-
     ColumnLayout {
-        anchors {
-            fill: parent
-            topMargin: header.height
+        anchors.fill: parent
+
+        RowLayout {
+            Layout.fillWidth: true
+
+            PlasmaExtras.Heading {
+                id: header
+                Layout.fillWidth: true
+                
+                level: 3
+                wrapMode: Text.WordWrap
+                text: DiscoverNotifier.message
+            }
+
+
+            Button {
+                Layout.preferredWidth: minimumWidth
+                iconName: "view-history"
+                text: i18n("History")
+                tooltip: i18n("Open /var/log/apt/history.log")
+                onClicked: root.action_openAptHistoryLog()
+            }
         }
         Item {
             Layout.fillWidth: true
