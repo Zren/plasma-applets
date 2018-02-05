@@ -1,0 +1,3 @@
+[submodule "eventcalendar"]
+	path = eventcalendar
+	url = git@github.com:Zren/plasma-applet-eventcalendar.git
