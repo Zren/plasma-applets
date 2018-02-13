@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version: 2
+# Version: 3
 
 function echoCommand () {
     echo -e "$(tput setab 12) $(tput sgr0)$(tput setaf 12)\uE0B0$(tput sgr0)$(tput setaf 9) $@$(tput sgr0) "
