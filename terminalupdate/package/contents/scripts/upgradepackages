@@ -38,7 +38,7 @@ sudo apt full-upgrade
 result="$?"
 if [ $result != 0 ]; then
     notify-send --icon="dialog-error" "Updates not installed" "Error while installing."
-    paplay /usr/share/sounds/KDE-Sys-App-Negative.ogg
+    paplay /usr/share/sounds/Oxygen-Sys-App-Negative.ogg
     exit $result
 fi
 
@@ -49,12 +49,12 @@ if [[ ! -z "$autoremovePackages" ]]; then
     echo ""
     echoCommand "sudo apt autoremove"
     notify-send --icon="update-none" "Auto-Remove Packages" "Need to cleanup unused packages."
-    paplay /usr/share/sounds/KDE-Sys-Question.ogg
+    paplay /usr/share/sounds/Oxygen-Sys-Question.ogg
     sudo apt autoremove
     result="$?"
     if [ $result != 0 ]; then
         notify-send --icon="dialog-error" "Could Not Auto-Remove Packages" "Error while attempting to remove auto-removeable packages."
-        paplay /usr/share/sounds/KDE-Sys-App-Negative.ogg
+        paplay /usr/share/sounds/Oxygen-Sys-App-Negative.ogg
         exit $result
     fi
 fi
@@ -65,4 +65,4 @@ echo ""
 echo "Done."
 # echo -e "\a"
 notify-send --icon="update-none" "Updates Installed" "Restart apps/desktop when convienient to for updates to take effect."
-paplay /usr/share/sounds/KDE-Sys-App-Positive.ogg
+paplay /usr/share/sounds/Oxygen-Sys-App-Positive.ogg

@@ -19,7 +19,7 @@ sudo apt update
 result="$?"
 if [ $result != 0 ]; then
     notify-send --icon="dialog-error" "Could Not Update" "Error while checking for updates."
-    paplay /usr/share/sounds/KDE-Sys-App-Negative.ogg
+    paplay /usr/share/sounds/Oxygen-Sys-App-Negative.ogg
     exit $result
 fi
 
