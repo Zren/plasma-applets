@@ -7,3 +7,6 @@
 [submodule "tiledmenu"]
 	path = tiledmenu
 	url = git@github.com:Zren/plasma-applet-tiledmenu.git
+[submodule "todolist"]
+	path = todolist
+	url = git@github.com:Zren/plasma-applet-todolist.git
