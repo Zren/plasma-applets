@@ -1,3 +1,6 @@
 [submodule "eventcalendar"]
 	path = eventcalendar
 	url = git@github.com:Zren/plasma-applet-eventcalendar.git
+[submodule "volumewin7mixer"]
+	path = volumewin7mixer
+	url = git@github.com:Zren/plasma-applet-volumewin7mixer.git
