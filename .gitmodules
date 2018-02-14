@@ -4,3 +4,6 @@
 [submodule "volumewin7mixer"]
 	path = volumewin7mixer
 	url = git@github.com:Zren/plasma-applet-volumewin7mixer.git
+[submodule "tiledmenu"]
+	path = tiledmenu
+	url = git@github.com:Zren/plasma-applet-tiledmenu.git
