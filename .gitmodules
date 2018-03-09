@@ -28,3 +28,6 @@
 [submodule "win7showdesktop"]
 	path = win7showdesktop
 	url = git@github.com:Zren/plasma-applet-win7showdesktop.git
+[submodule "kdeconnectdevice"]
+	path = kdeconnectdevice
+	url = git@github.com:Zren/plasma-applet-kdeconnectdevice.git
