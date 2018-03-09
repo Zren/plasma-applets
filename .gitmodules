@@ -10,3 +10,21 @@
 [submodule "todolist"]
 	path = todolist
 	url = git@github.com:Zren/plasma-applet-todolist.git
+[submodule "volumeslider"]
+	path = volumeslider
+	url = git@github.com:Zren/plasma-applet-volumeslider.git
+[submodule "terminalupdate"]
+	path = terminalupdate
+	url = git@github.com:Zren/plasma-applet-terminalupdate.git
+[submodule "presentwindows"]
+	path = presentwindows
+	url = git@github.com:Zren/plasma-applet-presentwindows.git
+[submodule "commandoutput"]
+	path = commandoutput
+	url = git@github.com:Zren/plasma-applet-commandoutput.git
+[submodule "batterytime"]
+	path = batterytime
+	url = git@github.com:Zren/plasma-applet-batterytime.git
+[submodule "win7showdesktop"]
+	path = win7showdesktop
+	url = git@github.com:Zren/plasma-applet-win7showdesktop.git
