@@ -42,3 +42,6 @@
 	path = kdeconnectdevice
 	url = git@github.com:Zren/plasma-applet-kdeconnectdevice.git
 	ignore=dirty
+[submodule "alphablackcontrol"]
+	path = alphablackcontrol
+	url = git@github.com:Zren/plasma-applet-alphablackcontrol.git
