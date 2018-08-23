@@ -46,3 +46,7 @@
 	path = alphablackcontrol
 	url = git@github.com:Zren/plasma-applet-alphablackcontrol.git
 	ignore=dirty
+[submodule "sysmonitordash"]
+	path = sysmonitordash
+	url = git@github.com:Zren/plasma-applet-sysmonitordash.git
+	ignore=dirty
