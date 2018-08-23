@@ -45,3 +45,4 @@
 [submodule "alphablackcontrol"]
 	path = alphablackcontrol
 	url = git@github.com:Zren/plasma-applet-alphablackcontrol.git
+	ignore=dirty
